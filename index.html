@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scratch & Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Work+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #161a2e;
+    --navy-deep: #0f1220;
+    --gold: #d6a24c;
+    --gold-dim: #a97e3b;
+    --cream: #f3ead7;
+    --plum: #3a2140;
+    --rose: #c66a63;
+    --line: rgba(243,234,215,0.14);
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(214,162,76,0.10), transparent 45%),
+      radial-gradient(ellipse at 90% 0%, rgba(198,106,99,0.08), transparent 40%),
+      var(--navy);
+    color: var(--cream);
+    font-family: 'Work Sans', sans-serif;
+    min-height: 100vh;
+    padding: 56px 20px 80px;
+  }
+
+  .wrap{
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom: 44px;
+  }
+
+  .kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  h1{
+    font-family:'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(38px, 6vw, 64px);
+    line-height: 1.05;
+    margin: 0 0 16px;
+    color: var(--cream);
+  }
+
+  .sub{
+    font-size: 16px;
+    color: rgba(243,234,215,0.72);
+    max-width: 460px;
+    margin: 0 auto;
+    line-height: 1.55;
+  }
+
+  .sub b{ color: var(--rose); font-weight:500; }
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 14px;
+    margin: 30px auto 0;
+    max-width: 340px;
+  }
+
+  .progress-track{
+    flex:1;
+    height: 3px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition: width .5s ease;
+  }
+  .progress-count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .grid{
+    margin-top: 48px;
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px 20px;
+  }
+  @media (min-width: 680px){
+    .grid{ grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .ticket{
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--cream);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  }
+
+  /* perforated notch top and bottom */
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px; height: 22px;
+    background: var(--navy);
+    border-radius: 50%;
+    z-index: 4;
+  }
+  .ticket::before{ top: -11px; }
+  .ticket::after{ bottom: -11px; }
+
+  .ticket-content{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding: 16px 14px 14px;
+    color: var(--plum);
+  }
+
+  .t-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--rose);
+  }
+
+  .t-title{
+    font-family:'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.18;
+    margin: 6px 0 4px;
+  }
+
+  .t-meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--gold-dim);
+    margin-bottom: 6px;
+  }
+
+  .t-blurb{
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(58,33,64,0.82);
+  }
+
+  .t-stub{
+    border-top: 1px dashed rgba(58,33,64,0.35);
+    padding-top: 8px;
+    margin-top: 8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    color: var(--gold-dim);
+  }
+
+  canvas.scratch{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index: 3;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .revealed canvas.scratch{
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .5s ease;
+  }
+
+  .hint{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: rgba(22,26,46,0.55);
+    pointer-events:none;
+    text-align:center;
+    padding: 0 10px;
+  }
+
+  footer{
+    text-align:center;
+    margin-top: 60px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(243,234,215,0.4);
+  }
+
+  .reset-btn{
+    display:block;
+    margin: 40px auto 0;
+    background:none;
+    border: 1px solid var(--line);
+    color: rgba(243,234,215,0.55);
+    font-family:'Work Sans', sans-serif;
+    font-size: 12.5px;
+    padding: 9px 18px;
+    border-radius: 30px;
+    cursor:pointer;
+    transition: border-color .2s ease, color .2s ease;
+  }
+  .reset-btn:hover{
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">17 SCREENINGS &middot; ONE TICKET EACH</div>
+    <h1>Scratch &amp; Watch</h1>
+    <p class="sub">Diecisiete fragmentos de m&iacute;, guardados en celuloide, para que los descubras a tu propio ritmo. <b>Para ti, Mario</b>.</p>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-count" id="progressCount">0 / 17</div>
+    </div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <button class="reset-btn" id="resetBtn">Reset all tickets</button>
+  <footer>PRINT AT HOME OR WATCH ON SCREEN &middot; NO REFUNDS ON HEARTBREAK</footer>
+</div>
+
+<script>
+const films = [
+  { title: "Spirited Away", meta: "2001 · Miyazaki", blurb: "A gorgeous spirit-world coming-of-age story." },
+  { title: "A Clockwork Orange", meta: "1971 · Kubrick", blurb: "Ultraviolent, stylish, unforgettable." },
+  { title: "Fight Club", meta: "1999 · Fincher", blurb: "Identity, rebellion, one of cinema's great twists." },
+  { title: "The Virgin Suicides", meta: "1999 · S. Coppola", blurb: "Hazy, aching, gorgeously shot teenage tragedy." },
+  { title: "Twin Peaks: Fire Walk with Me", meta: "1992 · Lynch", blurb: "Devastating and surreal. Watch the series first." },
+  { title: "Eternal Sunshine of the Spotless Mind", meta: "2004 · Gondry", blurb: "Heartbreak, memory, love worth repeating." },
+  { title: "Mulholland Drive", meta: "2001 · Lynch", blurb: "A puzzle-box noir that rewards rewatching." },
+  { title: "Blue Velvet", meta: "1986 · Lynch", blurb: "Suburbia's dark underbelly, Lynch at his most iconic." },
+  { title: "Am\u00e9lie", meta: "2001 · Jeunet", blurb: "Whimsical warmth to balance the darker ones." },
+  { title: "Pulp Fiction", meta: "1994 · Tarantino", blurb: "Essential, quotable, non-linear crime classic." },
+  { title: "Talk to Her", meta: "2002 · Almod\u00f3var", blurb: "Tender, strange, emotionally daring." },
+  { title: "Lost in Translation", meta: "2003 · S. Coppola", blurb: "Quiet, melancholic connection in Tokyo." },
+  { title: "City of God", meta: "2002 · Meirelles", blurb: "Kinetic, unflinching crime epic." },
+  { title: "The Perks of Being a Wallflower", meta: "2012 · Chbosky", blurb: "Tender coming-of-age, real emotional weight." },
+  { title: "Princess Mononoke", meta: "1997 · Miyazaki", blurb: "The fiercer counterpart to Spirited Away." },
+  { title: "Big Fish", meta: "2003 · Burton", blurb: "Myth, memory, and a father-son reckoning." },
+  { title: "Inception", meta: "2010 · Nolan", blurb: "A dream-within-a-dream puzzle, big-swing filmmaking." }
+];
+
+const grid = document.getElementById('grid');
+const progressFill = document.getElementById('progressFill');
+const progressCount = document.getElementById('progressCount');
+let revealedCount = 0;
+
+function updateProgress(){
+  progressFill.style.width = (revealedCount / films.length * 100) + '%';
+  progressCount.textContent = revealedCount + ' / ' + films.length;
+}
+
+films.forEach((film, i) => {
+  const ticket = document.createElement('div');
+  ticket.className = 'ticket';
+
+  const num = String(i + 1).padStart(2, '0');
+  ticket.innerHTML = `
+    <div class="ticket-content">
+      <div>
+        <div class="t-num">No. ${num}</div>
+        <div class="t-title">${film.title}</div>
+        <div class="t-meta">${film.meta}</div>
+      </div>
+      <div>
+        <div class="t-blurb">${film.blurb}</div>
+        <div class="t-stub"><span>ADMIT ONE</span><span>&#127916;</span></div>
+      </div>
+    </div>
+    <div class="hint">SCRATCH<br>TO REVEAL</div>
+    <canvas class="scratch"></canvas>
+  `;
+  grid.appendChild(ticket);
+
+  const canvas = ticket.querySelector('canvas.scratch');
+  const ctx = canvas.getContext('2d');
+  let revealed = false;
+  let scratching = false;
+  let lastCheck = 0;
+
+  function sizeCanvas(){
+    const rect = ticket.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    paintFoil();
+  }
+
+  function paintFoil(){
+    const w = canvas.width, h = canvas.height;
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#e3b768');
+    grad.addColorStop(0.5, '#c9944a');
+    grad.addColorStop(1, '#a97e3b');
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    for(let x = -h; x < w; x += 6){
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + h, h);
+      ctx.stroke();
+    }
+  }
+
+  function scratchAt(x, y){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 18, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function checkRevealed(){
+    if (revealed) return;
+    const now = Date.now();
+    if (now - lastCheck < 200) return;
+    lastCheck = now;
+    const sampleSize = 16;
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let cleared = 0, total = 0;
+    for(let i = 3; i < data.length; i += 4 * 40){
+      total++;
+      if (data[i] < 40) cleared++;
+    }
+    if (total > 0 && cleared / total > 0.45){
+      revealed = true;
+      ticket.classList.add('revealed');
+      revealedCount++;
+      updateProgress();
+    }
+  }
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const pt = e.touches ? e.touches[0] : e;
+    return { x: pt.clientX - rect.left, y: pt.clientY - rect.top };
+  }
+
+  function start(e){
+    scratching = true;
+    const p = getPos(e);
+    scratchAt(p.x, p.y);
+    e.preventDefault();
+  }
+  function move(e){
+    if (!scratching) return;
+    const p = getPos(e);
+    scratchAt(p.x, p.y);
+    checkRevealed();
+    e.preventDefault();
+  }
+  function end(){ scratching = false; checkRevealed(); }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, { passive:false });
+  canvas.addEventListener('touchmove', move, { passive:false });
+  canvas.addEventListener('touchend', end);
+
+  window.addEventListener('resize', () => { if(!revealed) sizeCanvas(); });
+  ticket._sizeCanvas = sizeCanvas;
+  sizeCanvas();
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.querySelectorAll('.ticket').forEach(t => t.classList.remove('revealed'));
+  revealedCount = 0;
+  updateProgress();
+  document.querySelectorAll('.ticket').forEach(t => t._sizeCanvas());
+});
+
+updateProgress();
+</script>
+</body>
+</html>
