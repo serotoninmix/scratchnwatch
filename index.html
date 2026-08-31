@@ -127,24 +127,36 @@
     width: 22px; height: 22px;
     background: var(--navy);
     border-radius: 50%;
-    z-index: 4;
+    z-index: 5;
   }
   .ticket::before{ top: -11px; }
   .ticket::after{ bottom: -11px; }
 
-  .ticket-content{
+  .poster-zone{
     position:absolute;
-    inset:0;
+    top:0; left:0; right:0;
+    height: 58%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+  }
+
+  .info-zone{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height: 42%;
+    background: var(--cream);
+    z-index: 1;
+    padding: 9px 12px 10px;
     display:flex;
     flex-direction:column;
     justify-content:space-between;
-    padding: 16px 14px 14px;
     color: var(--plum);
   }
 
   .t-num{
     font-family:'IBM Plex Mono', monospace;
-    font-size: 10px;
+    font-size: 9.5px;
     letter-spacing: 0.08em;
     color: var(--rose);
   }
@@ -152,33 +164,26 @@
   .t-title{
     font-family:'Playfair Display', serif;
     font-weight: 700;
-    font-size: 17px;
-    line-height: 1.18;
-    margin: 6px 0 4px;
+    font-size: 14.5px;
+    line-height: 1.15;
+    margin: 3px 0 3px;
   }
 
   .t-meta{
     font-family:'IBM Plex Mono', monospace;
-    font-size: 10.5px;
+    font-size: 9.5px;
     color: var(--gold-dim);
-    margin-bottom: 6px;
-  }
-
-  .t-blurb{
-    font-size: 12px;
-    line-height: 1.4;
-    color: rgba(58,33,64,0.82);
   }
 
   .t-stub{
     border-top: 1px dashed rgba(58,33,64,0.35);
-    padding-top: 8px;
-    margin-top: 8px;
+    padding-top: 6px;
+    margin-top: 6px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     font-family:'IBM Plex Mono', monospace;
-    font-size: 9.5px;
+    font-size: 9px;
     color: var(--gold-dim);
   }
 
@@ -261,25 +266,35 @@
 </div>
 
 <script>
+/*
+  TO ADD YOUR OWN POSTER IMAGES:
+  1. Create a folder named "posters" next to this index.html file in your repo.
+  2. Add an image for each film (jpg or png), any name you like.
+  3. Fill in the "img" field below with the relative path, e.g. "posters/spirited-away.jpg".
+  4. Leave "img" as an empty string "" for any film you don't have an image for —
+     it will automatically fall back to a nice solid color instead of a poster.
+*/
 const films = [
-  { title: "Spirited Away", meta: "2001 · Miyazaki", blurb: "A gorgeous spirit-world coming-of-age story." },
-  { title: "A Clockwork Orange", meta: "1971 · Kubrick", blurb: "Ultraviolent, stylish, unforgettable." },
-  { title: "Fight Club", meta: "1999 · Fincher", blurb: "Identity, rebellion, one of cinema's great twists." },
-  { title: "The Virgin Suicides", meta: "1999 · S. Coppola", blurb: "Hazy, aching, gorgeously shot teenage tragedy." },
-  { title: "Twin Peaks: Fire Walk with Me", meta: "1992 · Lynch", blurb: "Devastating and surreal. Watch the series first." },
-  { title: "Eternal Sunshine of the Spotless Mind", meta: "2004 · Gondry", blurb: "Heartbreak, memory, love worth repeating." },
-  { title: "Mulholland Drive", meta: "2001 · Lynch", blurb: "A puzzle-box noir that rewards rewatching." },
-  { title: "Blue Velvet", meta: "1986 · Lynch", blurb: "Suburbia's dark underbelly, Lynch at his most iconic." },
-  { title: "Am\u00e9lie", meta: "2001 · Jeunet", blurb: "Whimsical warmth to balance the darker ones." },
-  { title: "Pulp Fiction", meta: "1994 · Tarantino", blurb: "Essential, quotable, non-linear crime classic." },
-  { title: "Talk to Her", meta: "2002 · Almod\u00f3var", blurb: "Tender, strange, emotionally daring." },
-  { title: "Lost in Translation", meta: "2003 · S. Coppola", blurb: "Quiet, melancholic connection in Tokyo." },
-  { title: "City of God", meta: "2002 · Meirelles", blurb: "Kinetic, unflinching crime epic." },
-  { title: "The Perks of Being a Wallflower", meta: "2012 · Chbosky", blurb: "Tender coming-of-age, real emotional weight." },
-  { title: "Princess Mononoke", meta: "1997 · Miyazaki", blurb: "The fiercer counterpart to Spirited Away." },
-  { title: "Big Fish", meta: "2003 · Burton", blurb: "Myth, memory, and a father-son reckoning." },
-  { title: "Inception", meta: "2010 · Nolan", blurb: "A dream-within-a-dream puzzle, big-swing filmmaking." }
+  { title: "Spirited Away", meta: "2001 · Miyazaki", img: "posters/spiritedaway.jpeg" },
+  { title: "A Clockwork Orange", meta: "1971 · Kubrick", img: "posters/aclockworkorange.jpg" },
+  { title: "Fight Club", meta: "1999 · Fincher", img: "posters/fightclub.jpeg" },
+  { title: "The Virgin Suicides", meta: "1999 · S. Coppola", img: "posters/thevirginsuicides.jpg" },
+  { title: "Twin Peaks: Fire Walk with Me", meta: "1992 · Lynch", img: "posters/twinpeaks.jpg" },
+  { title: "Eternal Sunshine of the Spotless Mind", meta: "2004 · Gondry", img: "posters/eternalsunshine.jpg" },
+  { title: "Mulholland Drive", meta: "2001 · Lynch", img: "posters/mulhollanddrive.jpeg" },
+  { title: "Blue Velvet", meta: "1986 · Lynch", img: "posters/bluevelvet.jpeg" },
+  { title: "Am\u00e9lie", meta: "2001 · Jeunet", img: "posters/amelie.jpg" },
+  { title: "Pulp Fiction", meta: "1994 · Tarantino", img: "posters/pulpfiction.jpg" },
+  { title: "Talk to Her", meta: "2002 · Almod\u00f3var", img: "posters/talktoher.jpg" },
+  { title: "Lost in Translation", meta: "2003 · S. Coppola", img: "posters/lostintranslation.jpg" },
+  { title: "City of God", meta: "2002 · Meirelles", img: "posters/cityofgod.jpg" },
+  { title: "The Perks of Being a Wallflower", meta: "2012 · Chbosky", img: "posters/theperksofbeingawallflower.jpg" },
+  { title: "Princess Mononoke", meta: "1997 · Miyazaki", img: "posters/princessmononoke.jpeg" },
+  { title: "Big Fish", meta: "2003 · Burton", img: "posters/bigfish.jpg" },
+  { title: "Inception", meta: "2010 · Nolan", img: "posters/inception.jpg" }
 ];
+
+const palette = ['#7c3f52','#3f5e7c','#7c6b3f','#4f6b3f','#5e3f7c','#7c463f','#3f7c74','#6b3f7c'];
 
 const grid = document.getElementById('grid');
 const progressFill = document.getElementById('progressFill');
@@ -296,17 +311,20 @@ films.forEach((film, i) => {
   ticket.className = 'ticket';
 
   const num = String(i + 1).padStart(2, '0');
+  const fallback = palette[i % palette.length];
+  const posterStyle = film.img
+    ? `background-image:url('${film.img}'); background-color:${fallback};`
+    : `background-color:${fallback};`;
+
   ticket.innerHTML = `
-    <div class="ticket-content">
+    <div class="poster-zone" style="${posterStyle}"></div>
+    <div class="info-zone">
+      <div class="t-num">No. ${num}</div>
       <div>
-        <div class="t-num">No. ${num}</div>
         <div class="t-title">${film.title}</div>
         <div class="t-meta">${film.meta}</div>
       </div>
-      <div>
-        <div class="t-blurb">${film.blurb}</div>
-        <div class="t-stub"><span>ADMIT ONE</span><span>&#127916;</span></div>
-      </div>
+      <div class="t-stub"><span>ADMIT ONE</span><span>&#127916;</span></div>
     </div>
     <div class="hint">SCRATCH<br>TO REVEAL</div>
     <canvas class="scratch"></canvas>
@@ -357,7 +375,6 @@ films.forEach((film, i) => {
     const now = Date.now();
     if (now - lastCheck < 200) return;
     lastCheck = now;
-    const sampleSize = 16;
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let cleared = 0, total = 0;
     for(let i = 3; i < data.length; i += 4 * 40){
