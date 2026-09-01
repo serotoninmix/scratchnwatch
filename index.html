@@ -15,6 +15,8 @@
     --cream: #f3ead7;
     --plum: #3a2140;
     --rose: #c66a63;
+    --red-deep: #b13c3c;
+    --red-dim: #8f2f2f;
     --line: rgba(243,234,215,0.14);
   }
 
@@ -118,6 +120,10 @@
     box-shadow: 0 10px 24px rgba(0,0,0,0.35);
   }
 
+  .ticket-special{
+    box-shadow: 0 0 0 2px var(--red-deep), 0 10px 26px rgba(0,0,0,0.45);
+  }
+
   /* perforated notch top and bottom */
   .ticket::before, .ticket::after{
     content:"";
@@ -161,6 +167,8 @@
     color: var(--rose);
   }
 
+  .ticket-special .t-num{ color: var(--red-deep); }
+
   .t-title{
     font-family:'Playfair Display', serif;
     font-weight: 700;
@@ -169,11 +177,15 @@
     margin: 3px 0 3px;
   }
 
+  .ticket-special .t-title{ color: var(--red-dim); }
+
   .t-meta{
     font-family:'IBM Plex Mono', monospace;
     font-size: 9.5px;
     color: var(--gold-dim);
   }
+
+  .ticket-special .t-meta{ color: var(--red-dim); }
 
   .t-stub{
     border-top: 1px dashed rgba(58,33,64,0.35);
@@ -185,6 +197,11 @@
     font-family:'IBM Plex Mono', monospace;
     font-size: 9px;
     color: var(--gold-dim);
+  }
+
+  .ticket-special .t-stub{
+    border-top-color: rgba(177,60,60,0.35);
+    color: var(--red-dim);
   }
 
   canvas.scratch{
@@ -250,12 +267,12 @@
 <body>
 <div class="wrap">
   <header>
-    <div class="kicker">17 SCREENINGS &middot; ONE TICKET EACH</div>
+    <div class="kicker">17 FOR ME &middot; 1 FOR US</div>
     <h1>Scratch &amp; Watch</h1>
     <p class="sub">Diecisiete fragmentos de m&iacute;, guardados en celuloide, para que los descubras a tu propio ritmo. <b>Para ti, amor</b>.</p>
     <div class="progress-row">
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-count" id="progressCount">0 / 17</div>
+      <div class="progress-count" id="progressCount">0 / 18</div>
     </div>
   </header>
 
@@ -277,7 +294,7 @@
 const films = [
   { title: "Spirited Away", meta: "2001 · Miyazaki", img: "posters/spiritedaway.jpeg" },
   { title: "A Clockwork Orange", meta: "1971 · Kubrick", img: "posters/aclockworkorange.jpg" },
-  { title: "Fight Club", meta: "1999 · Fincher", img: "posters/fightclub.jpeg" },
+  { title: "Samsara", meta: "2011 · Ron Fricke", img: "posters/samsara.jpg" },
   { title: "The Virgin Suicides", meta: "1999 · S. Coppola", img: "posters/thevirginsuicides.jpg" },
   { title: "Twin Peaks: Fire Walk with Me", meta: "1992 · Lynch", img: "posters/twinpeaks.jpg" },
   { title: "Eternal Sunshine of the Spotless Mind", meta: "2004 · Gondry", img: "posters/eternalsunshine.jpg" },
@@ -291,7 +308,8 @@ const films = [
   { title: "The Perks of Being a Wallflower", meta: "2012 · Chbosky", img: "posters/theperksofbeingawallflower.jpg" },
   { title: "Princess Mononoke", meta: "1997 · Miyazaki", img: "posters/princessmononoke.jpeg" },
   { title: "Big Fish", meta: "2003 · Burton", img: "posters/bigfish.jpg" },
-  { title: "Inception", meta: "2010 · Nolan", img: "posters/inception.jpg" }
+  { title: "Inception", meta: "2010 · Nolan", img: "posters/inception.jpg" },
+  { title: "The Tree of Life", meta: "2011 · Malick", img: "posters/treeoflife.jpg", special: true }
 ];
 
 const palette = ['#7c3f52','#3f5e7c','#7c6b3f','#4f6b3f','#5e3f7c','#7c463f','#3f7c74','#6b3f7c'];
@@ -307,14 +325,18 @@ function updateProgress(){
 }
 
 films.forEach((film, i) => {
+  const isSpecial = !!film.special;
   const ticket = document.createElement('div');
-  ticket.className = 'ticket';
+  ticket.className = 'ticket' + (isSpecial ? ' ticket-special' : '');
 
   const num = String(i + 1).padStart(2, '0');
-  const fallback = palette[i % palette.length];
+  const fallback = isSpecial ? '#8f2f2f' : palette[i % palette.length];
   const posterStyle = film.img
     ? `background-image:url('${film.img}'); background-color:${fallback};`
     : `background-color:${fallback};`;
+
+  const stubLabel = isSpecial ? 'SEATS FOR TWO' : 'ADMIT ONE';
+  const stubIcon = isSpecial ? '&#10084;' : '&#127916;';
 
   ticket.innerHTML = `
     <div class="poster-zone" style="${posterStyle}"></div>
@@ -324,7 +346,7 @@ films.forEach((film, i) => {
         <div class="t-title">${film.title}</div>
         <div class="t-meta">${film.meta}</div>
       </div>
-      <div class="t-stub"><span>ADMIT ONE</span><span>&#127916;</span></div>
+      <div class="t-stub"><span>${stubLabel}</span><span>${stubIcon}</span></div>
     </div>
     <div class="hint">SCRATCH<br>TO REVEAL</div>
     <canvas class="scratch"></canvas>
@@ -347,9 +369,15 @@ films.forEach((film, i) => {
   function paintFoil(){
     const w = canvas.width, h = canvas.height;
     const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, '#e3b768');
-    grad.addColorStop(0.5, '#c9944a');
-    grad.addColorStop(1, '#a97e3b');
+    if (isSpecial) {
+      grad.addColorStop(0, '#d9615c');
+      grad.addColorStop(0.5, '#b13c3c');
+      grad.addColorStop(1, '#8f2f2f');
+    } else {
+      grad.addColorStop(0, '#e3b768');
+      grad.addColorStop(0.5, '#c9944a');
+      grad.addColorStop(1, '#a97e3b');
+    }
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
